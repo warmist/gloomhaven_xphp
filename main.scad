@@ -107,8 +107,8 @@ module dial(flip=false)
     linear_extrude(dial_height)
     indexed_with_spring();
     //numbers
-    text_rotation=flip?180:0;
-    ang_offset=flip?4:-4;
+    text_rotation=flip?0:0;
+    direction=flip?-1:1;
     color("red")
     linear_extrude(dial_height)
     ring(19,1);
@@ -121,17 +121,19 @@ module dial(flip=false)
         
         translate([0,0,dial_height])
         translate([
-            cos(inorm*360+ang_offset),
-            sin(inorm*360+ang_offset),0]*text_rad)
-        rotate([0,0,inorm*360+text_rotation])
+            cos(direction*(inorm*360)),
+            sin(direction*(inorm*360)),0]*text_rad)
+        
+        rotate([0,0,direction*inorm*360])
+        //mirror([0,0,text_rotation])
         linear_extrude(height=dial_text_height)
         {
-        text(str(i),4,halign="center");
+        text(str(i),4,halign="center",valign="center");
         //linear_extrude(text_h);
         }
     }
 }
-//dial();
+
 module dial_axis(height,lip_height,lip_w)
 {
     $fn=30;
@@ -215,7 +217,7 @@ module assembly()
 {
     //color("blue")
     translate([0,0,dial_full_height])
-    top_waxis();
+    #top_waxis();
     //#top();
     dial(true);
     translate([dial_radius*2+dial_to_dial,0,0])
