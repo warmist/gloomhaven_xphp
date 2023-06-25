@@ -1,8 +1,8 @@
 dial_radius=35;
 dial_outer_offset=2;
 dial_to_dial=5;
-dial_height=1.4;
-dial_text_height=0.4;
+dial_height=1.45;
+dial_text_height=0.35;
 dial_full_height=dial_height+dial_text_height;
 text_offset=28;
 output_part=0;
