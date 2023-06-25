@@ -103,33 +103,32 @@ module indexed_with_spring()
 
 module dial(flip=false)
 {
-    //dial itself
-    linear_extrude(dial_height)
-    indexed_with_spring();
-    //numbers
     text_rotation=flip?0:0;
     direction=flip?-1:1;
-    color("red")
-    linear_extrude(dial_height)
-    ring(19,1);
-    //numbers
-    color("red")
-    for(i=[0:29])
+    //dial itself
+    difference()
     {
-        text_rad=text_offset;
-        inorm=i/30;
-        
-        translate([0,0,dial_height])
-        translate([
-            cos(direction*(inorm*360)),
-            sin(direction*(inorm*360)),0]*text_rad)
-        
-        rotate([0,0,direction*inorm*360])
-        //mirror([0,0,text_rotation])
-        linear_extrude(height=dial_text_height)
+        linear_extrude(dial_full_height)
+        indexed_with_spring();
+        //numbers
+        color("red")
+        for(i=[0:29])
         {
-        text(str(i),4,halign="center",valign="center");
-        //linear_extrude(text_h);
+            text_rad=text_offset;
+            inorm=i/30;
+            
+            translate([0,0,dial_height+0.01])
+            translate([
+                cos(direction*(inorm*360)),
+                sin(direction*(inorm*360)),0]*text_rad)
+            
+            rotate([0,0,direction*inorm*360])
+            //mirror([0,0,text_rotation])
+            linear_extrude(height=dial_text_height+0.01)
+            {
+            text(str(i),4,halign="center",valign="center");
+            //linear_extrude(text_h);
+            }
         }
     }
 }
@@ -144,10 +143,11 @@ module dial_axis(height,lip_height,lip_w)
     indexed_circle(actual_r,30,1.5,1.5-engagement);
     translate([0,0,-height-lip_height])
     linear_extrude(lip_height)
-    #circle(actual_r+lip_w);
+    circle(actual_r+lip_w);
 }
 //color("blue")
 //dial_axis();
+
 module top()
 {
     circle_dist=dial_to_dial;
@@ -156,8 +156,11 @@ module top()
     
     finger_index_size=5;
     finger_cutout_size=circle_rad*1;
+    text_window_width=8;
+    text_window_height=6;
     difference()
     {
+        //body itself
         union(){
         translate([0,-circle_rad-outer_offset,0])
         square(
@@ -168,18 +171,29 @@ module top()
         translate([circle_rad*2+circle_dist,0,0])
         circle(circle_rad+outer_offset);
         };
-        
+        //finger access to the dials
         translate([-finger_cutout_size-circle_rad-outer_offset+finger_index_size,0,0])
         circle(finger_cutout_size);
         
         translate([finger_cutout_size+circle_rad*3+circle_dist+outer_offset-finger_index_size,0,0])
         circle(finger_cutout_size);
         
-        translate([text_offset,0,0])
-        square([8,5],true);
-        
-        translate([-text_offset+circle_rad*2+circle_dist,0,0])
-        square([8,5],true);
+        //viewports
+        intersection()
+        {
+            translate([text_offset,0,0])
+            square([text_window_width,text_window_height],true);
+            
+            ring(text_offset+text_window_width/2,text_window_width);
+        }
+        intersection()
+        {
+            translate([-text_offset+circle_rad*2+circle_dist,0,0])
+            square([text_window_width,text_window_height],true);
+            
+            translate([circle_rad*2+circle_dist,0,0])
+            ring(text_offset+text_window_width/2,text_window_width);
+        }
     }
     
 }
