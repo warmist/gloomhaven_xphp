@@ -5,6 +5,7 @@ dial_height=1.4;
 dial_text_height=0.4;
 dial_full_height=dial_height+dial_text_height;
 text_offset=28;
+output_part=0;
 module indexed_circle(
     radius=dial_radius,count=30,
     index_radius=3,index_offset=1.5)
@@ -237,15 +238,24 @@ module assembly()
     translate([dial_radius*2+dial_to_dial,0,0])
     dial();
 }
-assembly();
+//assembly();
 module print()
 {
-    translate([0,0,dial_height])
-    rotate([180,0,0])
-    top_waxis();
-    translate([0,dial_radius*2.5,0])
-    dial(true);
-    translate([dial_radius*2+dial_to_dial,dial_radius*2.5,0])
-    dial();
+    if(output_part==0)
+    {
+        translate([0,0,dial_height])
+        rotate([180,0,0])
+        top_waxis();
+    }
+    else if(output_part==1)
+    {
+        translate([0,dial_radius*2.5,0])
+        dial(true);
+    }
+    else
+    {
+        translate([dial_radius*2+dial_to_dial,dial_radius*2.5,0])
+        dial();
+    }
 }
-//print();
+print();
