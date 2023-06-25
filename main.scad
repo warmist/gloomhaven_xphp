@@ -1,7 +1,9 @@
 dial_radius=35;
 dial_outer_offset=2;
 dial_to_dial=5;
-dial_height=2.5;
+dial_height=1.4;
+dial_text_height=0.4;
+dial_full_height=dial_height+dial_text_height;
 text_offset=28;
 module indexed_circle(
     radius=dial_radius,count=30,
@@ -101,9 +103,8 @@ module indexed_with_spring()
 
 module dial(flip=false)
 {
-    dial_h=2;
     //dial itself
-    linear_extrude(dial_h)
+    linear_extrude(dial_height)
     indexed_with_spring();
     //numbers
     text_rotation=flip?180:0;
@@ -115,16 +116,15 @@ module dial(flip=false)
     color("red")
     for(i=[0:29])
     {
-        text_h=dial_height-dial_h;
         text_rad=text_offset;
         inorm=i/30;
         
-        translate([0,0,dial_h])
+        translate([0,0,dial_height])
         translate([
             cos(inorm*360+ang_offset),
             sin(inorm*360+ang_offset),0]*text_rad)
         rotate([0,0,inorm*360+text_rotation])
-        linear_extrude(height=text_h)
+        linear_extrude(height=dial_text_height)
         {
         text(str(i),4,halign="center");
         //linear_extrude(text_h);
@@ -184,27 +184,28 @@ module top()
 module top_waxis()
 {
     $fn=80;
-    lip_height=1;
+    lip_height=0.6;
     lip_size=0.1;
+    top_height=dial_height;
     difference()
     {
-        linear_extrude(1.5)
+        linear_extrude(top_height)
         top();
         
         translate([dial_radius*2+dial_to_dial,0,0])
         rotate([0,0,180])
-        linear_extrude(1.6)
+        linear_extrude(top_height+0.1)
         text("HP",8,halign="center",valign="center");
         
         //translate([dial_radius*2+dial_to_dial,0,0])
         rotate([0,0,180])
-        linear_extrude(1.6)
+        linear_extrude(top_height+0.1)
         text("XP",8,halign="center",valign="center");
     }
-    dial_axis(dial_height+0.1,lip_height,lip_size);
+    dial_axis(dial_full_height+0.1,lip_height,lip_size);
     
     translate([dial_radius*2+dial_to_dial,0,0])
-    dial_axis(dial_height+0.1,lip_height,lip_size);
+    dial_axis(dial_full_height+0.1,lip_height,lip_size);
     
     
     
@@ -213,27 +214,22 @@ module top_waxis()
 module assembly()
 {
     //color("blue")
-    translate([0,0,dial_height])
+    translate([0,0,dial_full_height])
     top_waxis();
     //#top();
     dial(true);
     translate([dial_radius*2+dial_to_dial,0,0])
     dial();
 }
-//assembly();
-
-module test_print4()
+assembly();
+module print()
 {
+    translate([0,0,dial_height])
+    rotate([180,0,0])
+    top_waxis();
+    translate([0,dial_radius*2.5,0])
     dial(true);
-}
-//test_print4();
-module test_print5()
-{
+    translate([dial_radius*2+dial_to_dial,dial_radius*2.5,0])
     dial();
 }
-test_print5();
-module test_print2()
-{
-    top_waxis();
-}
-//test_print2();
+//print();
