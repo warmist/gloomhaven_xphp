@@ -103,7 +103,7 @@ module indexed_with_spring()
 
 module dial(flip=false)
 {
-    text_rotation=flip?0:0;
+    text_rotation=flip?180:0;
     direction=flip?-1:1;
     //dial itself
     difference()
@@ -122,7 +122,7 @@ module dial(flip=false)
                 cos(direction*(inorm*360)),
                 sin(direction*(inorm*360)),0]*text_rad)
             
-            rotate([0,0,direction*inorm*360])
+            rotate([0,0,direction*inorm*360+text_rotation])
             //mirror([0,0,text_rotation])
             linear_extrude(height=dial_text_height+0.01)
             {
