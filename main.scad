@@ -4,8 +4,10 @@ dial_to_dial=5;
 dial_height=1.45;
 dial_text_height=0.35;
 dial_full_height=dial_height+dial_text_height;
-text_offset=28;
+text_offset=29;
 output_part=0;
+
+hole_r=25;
 module indexed_circle(
     radius=dial_radius,count=30,
     index_radius=3,index_offset=1.5)
@@ -89,7 +91,7 @@ module hole_with_spring(outer_r=18)
 module indexed_with_spring()
 {
     $fn=40;
-    hole_r=18;
+
     union()
     {
         difference()
@@ -127,7 +129,7 @@ module dial(flip=false)
             //mirror([0,0,text_rotation])
             linear_extrude(height=dial_text_height+0.01)
             {
-            text(str(i),4,halign="center",valign="center");
+            text(str(i),5,halign="center",valign="center");
             //linear_extrude(text_h);
             }
         }
@@ -137,17 +139,33 @@ module dial(flip=false)
 module dial_axis(height,lip_height,lip_w)
 {
     $fn=30;
-    engagement=0.5; //controls how much the spring moves between each tick
-    actual_r=18-1.5*6+engagement;
-    translate([0,0,-height])
-    linear_extrude(height)
-    indexed_circle(actual_r,30,1.5,1.5-engagement);
+    engagement=0.7; //controls how much the spring moves between each tick
+    actual_r=hole_r-1.5*6+engagement;
+    wall_w=2;
+    height_infill=0.4;
+    union()
+    {
+        //layer so that letters show up
+        translate([0,0,-height_infill])
+        linear_extrude(height_infill)
+        indexed_circle(actual_r,30,1.5,1.5-engagement);
+
+        //the rest of axis is with a hole for faster print
+        translate([0,0,-height-height_infill])
+        linear_extrude(height+height_infill)
+        difference()
+        {
+            
+            indexed_circle(actual_r,30,1.5,1.5-engagement);
+            circle(actual_r-wall_w);
+        }
+    }
     translate([0,0,-height-lip_height])
     linear_extrude(lip_height)
-    circle(actual_r+lip_w);
+    ring(actual_r+lip_w,wall_w);
 }
 //color("blue")
-//dial_axis();
+//dial_axis(dial_full_height+0.1,0.6,0);
 
 module top()
 {
@@ -200,9 +218,9 @@ module top()
 }
 module top_waxis()
 {
-    $fn=80;
+    $fn=90;
     lip_height=0.6;
-    lip_size=0.1;
+    lip_size=-0.0;
     top_height=dial_height;
     difference()
     {
@@ -232,7 +250,7 @@ module assembly()
 {
     //color("blue")
     translate([0,0,dial_full_height])
-    #top_waxis();
+    top_waxis();
     //#top();
     dial(true);
     translate([dial_radius*2+dial_to_dial,0,0])
