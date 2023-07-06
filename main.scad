@@ -49,12 +49,30 @@ module hole_with_spring(outer_r=18)
     detent=1.55;
     angle_step=120;
     outer_spring_w=15;
-    holder_w=2;
+    holder_w=spring_w;
+    holder_w2=1;
     union()
     {
+        
+        difference()
+        {
+            union()
+            {
+                ring(ring_r1,spring_w);
+                
+                ring(ring_r2,spring_w);
+            }
+            union()
+            {
+                for(angle=[0:angle_step:360])
+                {
+                    rotate([0,0,angle+90])
+                    translate([-holder_w2/2,0,0])
+                    square([holder_w2,outer_r+5]);
+                }
+            }
+        }
         ring(ring_r0,spring_w);
-        ring(ring_r1,spring_w);
-        ring(ring_r2,spring_w);
         difference()
         {
             ring(ring_r0-spring_w,spring_w);
@@ -81,7 +99,10 @@ module hole_with_spring(outer_r=18)
             {
                 
                 rotate([0,0,angle+90])
-                translate([-holder_w/2,0,0])
+                translate([-holder_w2/2-holder_w,0,0])
+                square([holder_w,outer_r+5]);
+                rotate([0,0,angle+90])
+                translate([holder_w2/2,0,0])
                 square([holder_w,outer_r+5]);
             }
         }
@@ -126,11 +147,9 @@ module dial(flip=false)
                 sin(direction*(inorm*360)),0]*text_rad)
             
             rotate([0,0,direction*inorm*360+text_rotation])
-            //mirror([0,0,text_rotation])
             linear_extrude(height=dial_text_height+0.01)
             {
             text(str(i),5,halign="center",valign="center");
-            //linear_extrude(text_h);
             }
         }
     }
